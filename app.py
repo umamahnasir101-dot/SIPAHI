@@ -243,9 +243,9 @@ div.stButton > button p {font-size:0.88rem; white-space:nowrap; overflow:visible
 if "page" not in st.session_state:
     st.session_state.page = "home"
 if "reports_count" not in st.session_state:
-    st.session_state.reports_count = 1847
-if "rupees_saved" not in st.session_state:
-    st.session_state.rupees_saved = 4_285_000
+    st.session_state.reports_count = 0
+if "scams_flagged" not in st.session_state:
+    st.session_state.scams_flagged = 0
 if "history" not in st.session_state:
     st.session_state.history = []
 
@@ -292,17 +292,16 @@ def page_home():
     <div class='hero-line' style='margin-top:1rem; margin-bottom:1.2rem;'></div>
     <div style='text-align:center; max-width:720px; margin:0 auto 2rem auto; color:#dfeee0; font-size:1.05rem; line-height:1.7;'>
     Sipahi is an autonomous multi-agent AI system that reads suspicious SMS &amp; WhatsApp messages
-    in <b>Roman Urdu / Urdu</b>, tells you instantly whether it's a scam and why, and feeds every
-    report into a live, crowdsourced fraud-intelligence network — protecting the next person automatically.
+    in <b>Roman Urdu / Urdu</b>, and tells you instantly whether it's a scam, how risky it is, and why — in plain Urdu.
     </div>
     """, unsafe_allow_html=True)
 
     c1, c2, c3, c4 = st.columns(4)
     stats = [
-        (f"{st.session_state.reports_count:,}", "Scams Reported"),
-        (f"Rs {st.session_state.rupees_saved/1_000_000:.2f}M", "Est. Losses Prevented"),
-        ("4", "AI Agents Working"),
-        ("24/7", "Protection")
+        (f"{st.session_state.reports_count:,}", "Messages Checked (This Session)"),
+        ("6", "Scam Types Covered"),
+        ("4", "Checking Steps"),
+        ("3", "Languages: Roman Urdu, Urdu, English")
     ]
     for c, (num, label) in zip([c1, c2, c3, c4], stats):
         with c:
@@ -366,7 +365,7 @@ def page_checker():
         st.session_state.history.append({"msg": msg, "result": result, "time": datetime.now()})
         st.session_state.reports_count += 1
         if result["is_scam"]:
-            st.session_state.rupees_saved += random.randint(15000, 120000)
+            st.session_state.scams_flagged += 1
         render_result(result, msg)
 
     if st.session_state.history:
@@ -395,7 +394,7 @@ def render_result(result, msg):
         ("Parser Agent", "Cleaned & normalized Roman Urdu/Urdu text, detected code-switching."),
         ("Pattern-Match Agent", f"Compared against known scam database — similarity: {result.get('pattern_match','N/A')}"),
         ("Risk-Reasoning Agent", "Evaluated urgency, authority-impersonation & payment-request signals."),
-        ("Network Agent", "Logged pattern to crowdsourced fraud-intelligence graph." if result["is_scam"] else "No new pattern needed — message looks safe.")
+        ("Network Agent", "Flagged as a scam pattern (shared database planned)." if result["is_scam"] else "No new pattern needed — message looks safe.")
     ]
     cols = st.columns(4)
     for c, (name, desc) in zip(cols, steps):
@@ -462,9 +461,8 @@ def render_result(result, msg):
     c1, c2 = st.columns(2)
     with c1:
         st.markdown(f"""<div class='sipahi-card' style='text-align:center;'>
-        🛡️ <b>Community Shield Score</b><br>
-        <span class='metric-num'>+{random.randint(12,48)}</span><br>
-        <span class='metric-label'>People protected by this report</span></div>""", unsafe_allow_html=True)
+        🛡️ <b>Stay Safe</b><br>
+        <span class='metric-label'>Never share OTPs, CNIC or account numbers with anyone who messages you first</span></div>""", unsafe_allow_html=True)
     with c2:
         if st.button("📤 Generate Shareable Verdict Card", use_container_width=True):
             st.success("Verdict card generated — share it to warn friends & family!")
@@ -481,10 +479,10 @@ def page_dashboard():
 
     c1, c2, c3, c4 = st.columns(4)
     stats = [
-        (f"{st.session_state.reports_count:,}", "Total Reports"),
-        (f"Rs {st.session_state.rupees_saved/1_000_000:.2f}M", "Losses Prevented"),
-        ("Karachi", "Top Hotspot"),
-        ("OTP Phishing", "Top Scam Type")
+        (f"{st.session_state.reports_count:,}", "Messages Checked (Session)"),
+        (f"{st.session_state.scams_flagged:,}", "Scams Flagged (Session)"),
+        ("6", "Scam Types Covered"),
+        ("Sample", "Charts Below Use Demo Data")
     ]
     for c, (num, label) in zip([c1, c2, c3, c4], stats):
         with c:
@@ -495,7 +493,7 @@ def page_dashboard():
 
     with left:
         st.markdown("<div class='sipahi-card'>", unsafe_allow_html=True)
-        st.markdown("<b>📈 Scam Reports Trend (Last 14 Days)</b>", unsafe_allow_html=True)
+        st.markdown("<b>📈 Scam Reports Trend (Last 14 Days)</b><br><small>Sample data for demonstration</small>", unsafe_allow_html=True)
         df = pd.DataFrame(TREND_DATA)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=df["date"], y=df["reports"], mode='lines+markers',
@@ -510,7 +508,7 @@ def page_dashboard():
 
     with right:
         st.markdown("<div class='sipahi-card'>", unsafe_allow_html=True)
-        st.markdown("<b>🍰 Scam Types Distribution</b>", unsafe_allow_html=True)
+        st.markdown("<b>🍰 Scam Types Distribution</b><br><small>Sample data for demonstration</small>", unsafe_allow_html=True)
         types = ["OTP Phishing", "Fake Investment", "Job Scam", "Loan Shark", "Fake Prize", "Charity Scam"]
         vals = [32, 22, 18, 12, 10, 6]
         fig2 = go.Figure(data=[go.Pie(labels=types, values=vals, hole=0.5,
@@ -521,7 +519,7 @@ def page_dashboard():
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='sipahi-card'>", unsafe_allow_html=True)
-    st.markdown("<b>🕸️ Live Scam Network Graph</b><br><small>Nodes = reported numbers/patterns · Edges = shared scam campaign</small>", unsafe_allow_html=True)
+    st.markdown("<b>🕸️ Live Scam Network Graph</b><br><small>Nodes = numbers/patterns · Edges = shared scam campaign · Sample data for demonstration</small>", unsafe_allow_html=True)
     G = nx.Graph()
     for node in NETWORK_DATA["nodes"]:
         G.add_node(node["id"], group=node["group"])
@@ -554,7 +552,7 @@ def page_dashboard():
     st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='sipahi-card'>", unsafe_allow_html=True)
-    st.markdown("<b>📋 Recent Community Reports</b>", unsafe_allow_html=True)
+    st.markdown("<b>📋 Recent Reports</b><br><small>Sample rows for demonstration. Your own scans appear at the top.</small>", unsafe_allow_html=True)
     sample_reports = [
         {"Time": "2 min ago", "Category": "OTP Phishing", "Risk Score": 94, "City": "Lahore", "Status": "🔴 Confirmed Scam"},
         {"Time": "18 min ago", "Category": "Fake Investment", "Risk Score": 88, "City": "Karachi", "Status": "🔴 Confirmed Scam"},
@@ -615,10 +613,9 @@ Response: {
         </div>""", unsafe_allow_html=True)
     with c2:
         st.markdown("""<div class='sipahi-card'>
-        <b>💰 Estimated ROI for a Mid-Size Bank</b><br><br>
-        Based on current fraud-reporting trends, Sipahi-style pre-screening could prevent an
-        estimated <b>Rs 15-40M</b> in annual customer fraud losses for a mid-size digital bank,
-        while reducing fraud-team manual review load.
+        <b>💰 Why Banks Would Want This</b><br><br>
+        Pre-screening messages could warn customers before they act, and cut manual review
+        work for fraud teams. (Illustrative. No savings figures are claimed.)
         </div>""", unsafe_allow_html=True)
 
 # ================= ABOUT =================
@@ -627,19 +624,18 @@ def page_about():
     st.markdown("""
     <div class='sipahi-card'>
     <b>The Problem:</b> SMS & WhatsApp financial scams (OTP phishing, fake investments, job scams,
-    loan sharks, fake prizes) are surging across Pakistan, disproportionately hurting people with
+    loan sharks, fake prizes) are a growing problem in Pakistan, hitting people with
     lower digital literacy who read only Urdu or Roman Urdu.
     </div>
     <div class='sipahi-card'>
     <b>The Solution:</b> A multi-agent AI pipeline — Parser, Pattern-Match, Risk-Reasoning, and
     Network agents — analyzes any forwarded message in seconds, explains the verdict in plain Urdu,
-    and adds new scam patterns to a shared, crowdsourced fraud-intelligence graph so every report
-    protects the next potential victim.
+    and shows the result with a risk score. A shared scam database, so every report can protect
+    the next person, is the planned next step.
     </div>
     <div class='sipahi-card'>
-    <b>Tech Stack:</b> LLM reasoning (Groq/Llama), agentic pipeline orchestration, NLP for Roman
-    Urdu/Urdu normalization, network-graph fraud intelligence, Streamlit interface, Power BI-ready
-    analytics layer.
+    <b>Tech Stack:</b> LLM reasoning (Groq/Llama), agentic pipeline orchestration, Roman Urdu/Urdu
+    handling, Plotly and NetworkX charts, Streamlit interface.
     </div>
     <div class='sipahi-card'>
     <b>Why It Matters:</b> This isn't just a consumer tool — it's designed to plug directly into
