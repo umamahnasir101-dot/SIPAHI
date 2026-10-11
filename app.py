@@ -8,6 +8,7 @@ import re
 from datetime import datetime, timedelta
 import random
 from dotenv import load_dotenv
+from logo_data import LOGO_HERO, LOGO_NAV
 
 load_dotenv()
 
@@ -207,6 +208,40 @@ div.stButton > button:hover {
 }
 
 a { color: #d9c47a !important; }
+
+/* ---- Branding ---- */
+.brand-bar {display:flex; align-items:center; gap:12px; padding:2px 0;}
+.brand-bar img {height:62px; filter: drop-shadow(0 0 12px rgba(120,255,180,0.35));}
+.brand-name {font-size:1.7rem; font-weight:800; letter-spacing:4px; color:#f2ecd8; line-height:1;}
+.brand-tag {font-size:0.62rem; letter-spacing:2.5px; color:#a9d8bf; margin-top:5px;}
+
+.hero-wrap {text-align:center; padding: 0.5rem 0 0.5rem 0; position:relative;}
+.hero-logo {width:230px; max-width:60%; animation: floatUp 5s ease-in-out infinite;
+            filter: drop-shadow(0 0 35px rgba(120,255,180,0.45));}
+.hero-glow {position:absolute; left:50%; top:60px; width:320px; height:320px; margin-left:-160px;
+            background: radial-gradient(circle, rgba(120,255,180,0.18), transparent 65%);
+            animation: pulseGlow 4s ease-in-out infinite; border-radius:50%; z-index:0;}
+.hero-wrap img, .hero-wrap div {position:relative; z-index:1;}
+.hero-name {font-size:4.2rem; font-weight:800; letter-spacing:10px; margin-top:0.4rem;
+            background: linear-gradient(90deg, #f2ecd8, #d9c47a, #f2ecd8);
+            background-size: 200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            animation: shimmer 5s linear infinite;}
+.hero-tagline {color:#a9d8bf; letter-spacing:5px; font-size:1rem; margin-top:-0.2rem;}
+.hero-pill {display:inline-block; margin-top:1.1rem; padding:6px 18px; border-radius:30px;
+            border:1px solid rgba(217,196,122,0.5); background:rgba(14,58,41,0.7);
+            color:#d9c47a; font-size:0.8rem; letter-spacing:1.5px; font-weight:600;}
+@keyframes shimmer {to {background-position: 200% center;}}
+
+.floaty-dots {position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden;}
+.floaty-dots span {position:absolute; border-radius:50%; background:rgba(120,255,180,0.10);
+                    animation: drift 14s ease-in-out infinite;}
+@keyframes drift {0%,100% {transform:translateY(0) scale(1);} 50% {transform:translateY(-40px) scale(1.15);}}
+
+.site-footer {text-align:center; color:#7fb597; font-size:0.78rem; letter-spacing:1.5px;
+              margin-top:3rem; padding-top:1rem; border-top:1px solid rgba(217,196,122,0.2);}
+.feat-card {text-align:center; font-weight:600;}
+.feat-card .ico {font-size:1.8rem; display:block; margin-bottom:6px;}
+.feat-card small {display:block; color:#a9d8bf; font-weight:400; margin-top:4px;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -233,34 +268,37 @@ def back_button():
         st.markdown("<br>", unsafe_allow_html=True)
 
 def top_nav():
-    logo_c, nav_c = st.columns([1, 6])
-    with logo_c:
-        if os.path.exists("assets/logo.png"):
-            st.image("assets/logo.png", width=70)
+    brand_c, nav_c = st.columns([2, 7])
+    with brand_c:
+        st.markdown(f"""<div class='brand-bar'>
+            <img src='data:image/png;base64,{LOGO_NAV}'/>
+            <div><div class='brand-name'>SIPAHI</div>
+            <div class='brand-tag'>FORTRESS OF DIGITAL FINANCE</div></div></div>""",
+            unsafe_allow_html=True)
     with nav_c:
         cols = st.columns(5)
         labels = [("🏠 Home", "home"), ("🔍 Scam Checker", "checker"),
-                  ("📊 Live Dashboard", "dashboard"), ("🏦 For Banks (API)", "api"),
+                  ("📊 Dashboard", "dashboard"), ("🏦 For Banks", "api"),
                   ("ℹ️ How It Works", "about")]
         for c, (label, key) in zip(cols, labels):
             with c:
                 if st.button(label, key=f"nav_{key}", use_container_width=True):
                     goto(key)
-    st.markdown("<div class='hero-line'></div>", unsafe_allow_html=True)
+    st.markdown("<div class='hero-line' style='margin-top:0.6rem;'></div>", unsafe_allow_html=True)
 
 # ================= HOME =================
 def page_home():
-    logo_col1, logo_col2, logo_col3 = st.columns([1, 1, 1])
-    with logo_col2:
-        if os.path.exists("assets/logo.png"):
-            st.markdown("<div class='logo-glow'>", unsafe_allow_html=True)
-            st.image("assets/logo.png", use_container_width=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("<div class='hero-line'></div>", unsafe_allow_html=True)
-
-    st.markdown("""
-    <div style='text-align:center; max-width:700px; margin:0 auto 2rem auto; color:#d7ecd f; color:#dfeee0; font-size:1.05rem; line-height:1.6;'>
-    Sipahi is an autonomous multi-agent AI system that reads suspicious SMS & WhatsApp messages
+    st.markdown(f"""
+    <div class='hero-wrap'>
+        <div class='hero-glow'></div>
+        <img class='hero-logo' src='data:image/png;base64,{LOGO_HERO}'/>
+        <div class='hero-name'>SIPAHI</div>
+        <div class='hero-tagline'>FORTRESS OF DIGITAL FINANCE</div>
+        <div class='hero-pill'>ALIBABA CLOUD AI HACKATHON 2026 &nbsp;·&nbsp; FINANCIAL INCLUSION</div>
+    </div>
+    <div class='hero-line' style='margin-top:1.5rem;'></div>
+    <div style='text-align:center; max-width:720px; margin:0 auto 2rem auto; color:#dfeee0; font-size:1.05rem; line-height:1.7;'>
+    Sipahi is an autonomous multi-agent AI system that reads suspicious SMS &amp; WhatsApp messages
     in <b>Roman Urdu / Urdu</b>, tells you instantly whether it's a scam and why, and feeds every
     report into a live, crowdsourced fraud-intelligence network — protecting the next person automatically.
     </div>
@@ -292,12 +330,18 @@ def page_home():
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("<div class='section-title'>What Sipahi Detects</div>", unsafe_allow_html=True)
-    cats = ["💳 OTP / Banking Phishing", "📈 Fake Investment Schemes", "💼 Job Offer Scams",
-            "🏦 Loan Shark Offers", "🎁 Fake Prize / Lottery", "🕌 Fake Charity Requests"]
+    cats = [("💳", "OTP / Banking Phishing", "Fake bank & wallet alerts"),
+            ("📈", "Fake Investment Schemes", "\"Guaranteed\" returns, Ponzi pitches"),
+            ("💼", "Job Offer Scams", "Pay-to-get-hired traps"),
+            ("🏦", "Loan Shark Offers", "Predatory instant-loan SMS"),
+            ("🎁", "Fake Prize / Lottery", "CNIC & fee-harvesting draws"),
+            ("🕌", "Fake Charity Requests", "Zakat & donation impersonation")]
     cols = st.columns(3)
-    for i, cat in enumerate(cats):
+    for i, (ico, name, sub) in enumerate(cats):
         with cols[i % 3]:
-            st.markdown(f"<div class='sipahi-card' style='text-align:center;'>{cat}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='sipahi-card feat-card'><span class='ico'>{ico}</span>{name}<small>{sub}</small></div>", unsafe_allow_html=True)
+
+    st.markdown("<div class='site-footer'>🛡️ SIPAHI · Fortress of Digital Finance · Built by Umamah &amp; Huzaifa</div>", unsafe_allow_html=True)
 
 # ================= SCAM CHECKER =================
 def page_checker():
@@ -612,6 +656,12 @@ def page_about():
     """, unsafe_allow_html=True)
 
 # ================= ROUTER =================
+st.markdown("""<div class='floaty-dots'>
+<span style='width:180px;height:180px;left:8%;top:25%;animation-delay:0s;'></span>
+<span style='width:120px;height:120px;left:82%;top:15%;animation-delay:2s;'></span>
+<span style='width:220px;height:220px;left:70%;top:62%;animation-delay:4s;'></span>
+<span style='width:90px;height:90px;left:20%;top:72%;animation-delay:6s;'></span>
+</div>""", unsafe_allow_html=True)
 top_nav()
 back_button()
 page = st.session_state.page
@@ -625,3 +675,6 @@ elif page == "api":
     page_api()
 elif page == "about":
     page_about()
+
+if page != "home":
+    st.markdown("<div class='site-footer'>🛡️ SIPAHI · Fortress of Digital Finance · Built by Umamah &amp; Huzaifa</div>", unsafe_allow_html=True)
